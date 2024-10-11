@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App Avanzada</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Todo App</h1>
+      <button id="addTaskBtn" type="button">Agregar Tarea</button>
+    </header>
+
+    <main>
+      <div class="filters">
+        <button type="button" id="filterAll">Todas</button>
+        <button type="button" id="filterCompleted">Completadas</button>
+        <button type="button" id="filterPending">Pendientes</button>
+        <button type="button" id="filterPriority">Alta Prioridad</button>
+      </div>
+      <div id="taskList"></div>
+    </main>
+
+    <!-- Modal para agregar/editar tareas -->
+    <div id="taskModal" class="modal">
+      <div class="modalCenter">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2 id="modalTitle">Nueva tarea</h2>
+          <form id="taskForm">
+            <input type="hidden" id="taskId" />
+            <div>
+              <label for="taskName">Nombre</label>
+              <input type="text" id="taskName" required />
+            </div>
+            <div>
+              <label for="taskDescription">Descripción</label>
+              <textarea id="taskDescription"></textarea>
+            </div>
+            <div>
+              <label for="taskDate">Fecha Límite</label>
+              <input type="date" id="taskDate" required />
+            </div>
+            <div>
+              <label for="taskPriority">Prioridad</label>
+              <select id="taskPriority">
+                <option value="normal">Normal</option>
+                <option value="high">Alta</option>
+              </select>
+            </div>
+            <button type="submit">Guardar Tarea</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js" type="module"></script>
+  </body>
+</html>
