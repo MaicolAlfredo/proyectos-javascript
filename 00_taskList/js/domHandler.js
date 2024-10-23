@@ -3,15 +3,15 @@ import { Task } from "./taskManager.js";
 export class DOMHandler {
   constructor(taskManager) {
     this.taskManager = taskManager;
-    this.modal = document.getElementById("taskModal"); 
-    this.modalTitle = document.getElementById("modalTitle"); 
-    this.form = document.getElementById("taskForm"); 
-    this.taskList = document.getElementById("taskList"); 
-    this.addTaskBtn = document.getElementById("addTaskBtn"); 
+    this.modal = document.getElementById("taskModal");
+    this.modalTitle = document.getElementById("modalTitle");
+    this.form = document.getElementById("taskForm");
+    this.taskList = document.getElementById("taskList");
+    this.addTaskBtn = document.getElementById("addTaskBtn");
 
     //paginacion
     this.currentPage = 1;
-    this.tasksPerPage = 5;
+    this.tasksPerPage = 3;
     this.totalPages = 0;
     //filtros recordado
     this.filter = "all";
@@ -117,7 +117,7 @@ export class DOMHandler {
       prevBtn.textContent = "Anterior";
       prevBtn.addEventListener("click", () => {
         this.currentPage--;
-        this.renderTask(this.filter);
+        this.renderTask();
       });
       paginationContainer.appendChild(prevBtn);
     }
@@ -131,9 +131,20 @@ export class DOMHandler {
       }
       pageButton.addEventListener("click", () => {
         this.currentPage = i;
-        this.renderTask(this.filter);
+        this.renderTask();
       });
       paginationContainer.appendChild(pageButton);
+    }
+
+    //boton siguiente
+    if (this.currentPage < this.totalPages) {
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "Siguiente";
+      nextBtn.addEventListener("click", () => {
+        this.currentPage++;
+        this.renderTask();
+      });
+      paginationContainer.appendChild(nextBtn);
     }
 
     this.taskList.appendChild(paginationContainer);
