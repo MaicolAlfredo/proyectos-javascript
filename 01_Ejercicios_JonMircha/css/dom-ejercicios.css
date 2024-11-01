@@ -67,6 +67,8 @@ img {
   right: 0;
   width: 100%;
   background-color: var(--second-modal-color);
+  opacity:0;
+  visibility: hidden;
   /* css para javascript */
   transition: transform 0.3s ease;
   transform: translate(0, -100%);
@@ -75,6 +77,8 @@ img {
 /* clase para asignar al js */
 .panel.is-active {
   transform: translate(0, 0);
+  opacity:1;
+  visibility: visible;
 }
 
 /* menu hamburguesa */
