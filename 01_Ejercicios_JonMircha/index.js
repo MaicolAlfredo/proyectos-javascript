@@ -11,4 +11,5 @@ d.addEventListener("DOMContentLoaded", (e) => {
 
 d.addEventListener("keydown", (e) => {
   shortcuts(e);
+  moveBall(e, ".ball", ".stage");
 });
