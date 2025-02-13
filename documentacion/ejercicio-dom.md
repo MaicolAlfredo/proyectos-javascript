@@ -1,6 +1,7 @@
 # Ejercicio del DOM
 
 1. [JavaScript 88 Tema DarkLight](#javascript-88-dom-ejercicios-prácticos-tema-darklight)
+1. [JavaScript 89 API LocalStorage](#javascript-89-dom-ejercicios-prácticos-api-localstorage)
 
 ## JavaScript 88. DOM Ejercicios Prácticos Tema DarkLight
 
@@ -295,3 +296,171 @@ export default function darkTheme(btn, classDark) {
   });
 }
 ```
+
+## JavaScript 89. DOM Ejercicios Prácticos API localStorage
+
+En la clase anterior, habíamos dejado nuestro ejercicio para aplicar el tema oscuro en el DOM. Sin embargo, el detalle es que, cada vez que recargamos el navegador, obtenemos el tema claro. Esto ocurre porque el tema predeterminado es el claro.
+
+En este ejercicio, resolveremos este problema utilizando una API de los navegadores llamada Web Storage, específicamente localStorage. Esta API nos permite almacenar información en el almacenamiento persistente del navegador.
+
+Si vamos a las herramientas de desarrollo del navegador, en la pestaña Application, podremos ver y gestionar los datos guardados en el localStorage.
+
+La API de Web Storage incluye dos tipos de almacenamiento: localStorage y sessionStorage (almacenamiento por sesión). localStorage es un objeto integrado en los navegadores que permite almacenar datos de forma persistente. Datos persisten incluso después de cerrar el navegador.
+
+Vamos a hacer una pequeña refactorización de nuestro código para que pueda funcionar. Lo primero es que necesitamos dos métodos del localStorage: uno que permita obtener el valor de una variable de tipo localStorage y otro que permita actualizar o establecer un valor para localStorage.
+
+Además de hacer la delegación del clic del botón, necesitamos desencadenar un evento de tipo DOMContentLoaded, porque cuando cargue nuestra aplicación, independientemente del funcionamiento del clic de la luna y el sol, queremos que el navegador consulte al localStorage si existe una variable (la que decide si estamos en tema oscuro o no) y, en base a eso, aplique los estilos correspondientes. Entonces, vamos a asignar un evento DOMContentLoaded:
+`d.addEventListener("DOMContentLoaded", (e) => {});`. Dentro del DOMContentLoaded, declaramos una alerta: `alert("Hola desde la funcion darktheme")` Recargamos el navegador y, automáticamente, debería aparecer la alerta, pero no lo hace. Esto ocurre porque en el archivo `index_dom.js` (donde ejecutamos la función `darkTheme`) se puede observar que la programación se está desencadenando con el `DOMContentLoaded` del archivo principal (`index_dom.js`).
+
+Sin embargo, hay algo importante que recalcar: el archivo `tema_oscuro.js`, además de trabajar con el evento del clic, utiliza otro DOMContentLoaded. No podemos tener un evento del mismo tipo en ambos archivos, porque ese evento ya está asignado en el ámbito donde se ejecuta la función en index_dom.js.
+
+Aclaración técnica adicional (sin código):
+El evento DOMContentLoaded solo se ejecuta una vez al cargar el DOM. Si está declarado en dos archivos diferentes, solo el primero en cargarse funcionará, a menos que se maneje con una lógica centralizada. Esto explica por qué la alerta no aparece: hay una duplicidad de eventos que entran en conflicto.
+
+`tema_oscuro.js`
+
+```js
+const d = document;
+
+export default function darkTheme(btn, classDark) {
+  const $themeBtn = d.querySelector(btn),
+    $selectors = d.querySelectorAll("[data-dark]");
+
+  let moon = "🌙",
+    sun = "☀️";
+
+  d.addEventListener("click", (e) => {
+    if (e.target.matches(btn)) {
+      if ($themeBtn.textContent === moon) {
+        $selectors.forEach((el) => el.classList.add(classDark));
+        $themeBtn.textContent = sun;
+      } else {
+        $selectors.forEach((el) => el.classList.remove(classDark));
+        $themeBtn.textContent = moon;
+      }
+    }
+  });
+
+  d.addEventListener("DOMContentLoaded", (e) => {});
+}
+```
+
+Para que el DOMContentLoaded de la funcion `darkTheme` funcione, lo que podemos hacer es sacarlo literalmente del DOMContentLoaded del archivo index_dom.js. Es decir, evitar anidar ambos eventos, ya que si el código de tema_oscuro.js está dentro del DOMContentLoaded de index_dom.js, se crea un conflicto de ejecución.
+
+Explicación técnica (sin código):
+El evento DOMContentLoaded no debe anidarse entre archivos, ya que si un archivo principal (como index_dom.js) ya lo está usando para encapsular su lógica, el segundo archivo (tema_oscuro.js) no podrá ejecutar su propio DOMContentLoaded de forma independiente. La solución es separar los eventos, asegurando que cada archivo gestione su propio DOMContentLoaded sin depender del otro.
+
+`index_dom.js`
+
+```js
+import hamburgerMenu from "./dom/menu_hamburguesa.js";
+import { digitalClock, alarm } from "./dom/reloj.js";
+import { shortcuts, moveBall } from "./dom/teclado.js";
+import countdown from "./dom/cuenta_regresiva.js";
+import { scrollTopButton } from "./dom/boton_scroll.js";
+import darkTheme from "./dom/tema_oscuro.js";
+const d = document;
+
+d.addEventListener("DOMContentLoaded", (e) => {
+  hamburgerMenu(".panel-btn", ".panel", ".menu a");
+  digitalClock("#reloj", "#activar-reloj", "#desactivar-reloj");
+  alarm("#activar-alarma", "#desactivar-alarma");
+  countdown("countdown", "Jan 1,2025", "Feliz año nuevo");
+  scrollTopButton(".scroll-top-btn");
+});
+
+d.addEventListener("keydown", (e) => {
+  shortcuts(e);
+  moveBall(e, ".ball", ".stage");
+});
+
+darkTheme(".dark-theme-btn", "dark-mode");
+```
+
+Esta 2 lineas de codigo que activa el modo oscuro.
+
+```js
+$selectors.forEach((el) => el.classList.add(classDark));
+$themeBtn.textContent = sun;
+```
+
+Lo que haremos es crearnos una función que se llame `lightMode` y otra `darkMode`. Estas funciones tendrán las líneas de código que hacen cambiar la luna por el sol en el botón, y que aplican o quitan la clase de CSS a los elementos que usan el tema oscuro. Estas funciones deben ejecutarse tanto al clic del botón como al evento DOMContentLoaded cuando recarguemos. Así, para no duplicar el código, lo guardaremos en funciones reutilizables.
+
+Muy bien. Ahora, lo importante es que, cuando cargue el documento, debemos verificar si existe una variable en localStorage que controle el estado del tema oscuro. Como vamos a utilizar localStorage con frecuencia, podemos hacer lo mismo que hicimos con la variable `d` (que guarda `document`): crear una variable llamada `ls` que sea igual a `localStorage`.Utilizamos un `if` para verificar si localStorage (almacenado en la variable `ls`), en conjunto con el método `getItem()`, contiene un valor guardado. Lo único que tenemos que pasarle es el nombre de la clave; en este caso, nuestra clave se llamará "`theme`".
+
+Si invocamos esta validación en un `console.log(ls.getItem("theme"))`, veremos que nos devuelve `null`. Esto ocurre porque, si nos vamos a la pestaña de Application en las herramientas de desarrollo, no existe ninguna llave en el localStorage con el nombre "`theme`".
+
+Si no existe ninguna variable de tipo `localStorage` que se llame "`theme`", es decir, si `ls.getItem("theme")` es igual (===) a `null`, entonces vamos a decirle que, la primera vez, como no existe esta variable en el navegador de nuestro usuario, vamos a establecer un nuevo valor.
+
+El método para establecer una variable en `localStorage` es `setItem`. Noten que es muy similar a getAttribute y setAttribute en el DOM: en lugar de getAttribute, usamos getItem, y en lugar de setAttribute, usamos setItem.
+
+El método `localStorage.setItem` recibe dos parámetros:
+
+1. El nombre de la variable (en este caso, "theme"), que es lo que se muestra como key en la pestaña Application de las herramientas de desarrollo.
+
+2. El valor (value) que queremos asignar a esa variable.
+
+Entonces, vamos a decirle que, si no existe una variable de tipo localStorage llamada "theme", la vamos a crear y le asignaremos el valor "light"
+
+Voy a tener dos condicionales más:
+
+1. Primer condicional:
+   Verifica en localStorage si la variable "theme" es igual (===) a "light". Si es así, ejecutamos la programación que tenemos guardada en la función lightMode().
+
+2. Segundo condicional:
+   Verifica en localStorage si la variable "theme" es igual (===) a "dark". Si es así, ejecutamos la programación que tenemos guardada en la función darkMode().
+
+Las funciones `lightMode` y `darkMode`, además de ejecutar la lógica que desactiva o activa el modo oscuro, también deben almacenar el último cambio en localStorage. Internamente, tendríamos que acceder a la variable localStorage (`ls`) y establecerle el valor del tema correspondiente:
+
+1. En la función lightMode:
+   Debemos asegurarnos de guardar el valor "light": `ls.setItem("theme", "light");`.
+
+2. En la función darkMode:
+   Debemos asegurarnos de guardar el valor "dark": `ls.setItem("theme", "dark");`
+
+`tema_oscuro.js`
+
+```js
+const d = document,
+  ls = localStorage;
+
+export default function darkTheme(btn, classDark) {
+  const $themeBtn = d.querySelector(btn),
+    $selectors = d.querySelectorAll("[data-dark]");
+
+  let moon = "🌙",
+    sun = "☀️";
+
+  const lightMode = () => {
+    $selectors.forEach((el) => el.classList.remove(classDark));
+    $themeBtn.textContent = moon;
+    ls.setItem("theme", "light");
+  };
+
+  const darkMode = () => {
+    $selectors.forEach((el) => el.classList.add(classDark));
+    $themeBtn.textContent = sun;
+    ls.setItem("theme", "dark");
+  };
+
+  d.addEventListener("click", (e) => {
+    if (e.target.matches(btn)) {
+      if ($themeBtn.textContent === moon) {
+        darkMode();
+      } else {
+        lightMode();
+      }
+    }
+  });
+
+  d.addEventListener("DOMContentLoaded", (e) => {
+    if (ls.getItem("theme") === null) ls.setItem("theme", "light");
+  });
+
+  if (ls.getItem("theme") === "light") lightMode();
+
+  if (ls.getItem("theme") === "dark") darkMode();
+}
+```
+
+[indice](#ejercicio-del-dom)

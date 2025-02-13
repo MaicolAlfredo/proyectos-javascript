@@ -12,10 +12,12 @@ d.addEventListener("DOMContentLoaded", (e) => {
   alarm("assets/alarm.mp3", "#activar-alarma", "#desactivar-alarma");
   countdown("countdown", "Jan 1, 2025", "Feliz año nuevo");
   scrollTopButton(".scroll-top-btn");
-  darkTheme(".dark-theme-btn", "dark-mode");
+ 
 });
 
 d.addEventListener("keydown", (e) => {
   shortcuts(e);
   moveBall(e, ".ball", ".stage");
 });
+
+ darkTheme(".dark-theme-btn", "dark-mode");
