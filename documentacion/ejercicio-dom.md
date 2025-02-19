@@ -2,6 +2,7 @@
 
 1. [JavaScript 88 Tema DarkLight](#javascript-88-dom-ejercicios-prácticos-tema-darklight)
 1. [JavaScript 89 API LocalStorage](#javascript-89-dom-ejercicios-prácticos-api-localstorage)
+1. [JavaScript 90 Responsive con JavaScript](#javascript-90-dom-ejercicios-prácticos-responsive-con-javascript)
 
 ## JavaScript 88. DOM Ejercicios Prácticos Tema DarkLight
 
@@ -461,6 +462,282 @@ export default function darkTheme(btn, classDark) {
 
   if (ls.getItem("theme") === "dark") darkMode();
 }
+```
+
+[indice](#ejercicio-del-dom)
+
+## JavaScript 90. DOM Ejercicios Prácticos Responsive con Javascript
+
+Recuerden que estamos en las clases donde estamos haciendo ejercicios de los conceptos que estuvimos trabajando con el DOM. El último ejercicio que hicimos fue justamente este del dark theme y light theme, en el cual utilizamos la API de localStorage para almacenar la información y que, en la siguiente visita del usuario a nuestro ejercicio, recordará qué tema fue el que quedó activo. ¡Perfecto!
+
+El ejercicio que vamos a hacer hoy es sobre responsive design con JavaScript. No se trata simplemente de aplicar un display: none; o un display: block; para mostrar u ocultar el mapa, los enlaces o el video de YouTube. Estamos haciendo lo que se conoce como "responsible responsive design".
+
+De hecho, aquí tengo algunos enlaces. En el año 2012, Ethan Marcotte introdujo el artículo "Responsive Web Design", donde planteó todas estas buenas prácticas para enfrentar los desafíos del diseño web en dispositivos móviles y táctiles, que eran diferentes a las computadoras tradicionales. Posteriormente, Ethan Marcotte publicó un libro sobre el tema.
+
+En los primeros años, el responsive design fue criticado porque, lamentablemente, muchos diseñadores caímos en malas prácticas, como ocultar contenido en la versión móvil simplemente usando display: none; o display: block;. Visualmente, parecía que habíamos solucionado el problema, pero ¿qué pasaba cuando el usuario estaba en su dispositivo móvil consumiendo su plan de datos mensual? Aunque ocultábamos visualmente esos elementos, se seguían descargando, lo que afectaba el rendimiento y la experiencia del usuario.
+
+Posteriormente, alrededor de los años 2014 y 2015, Scott Jehl, otro diseñador web muy reconocido, publicó un libro llamado "Responsible Responsive Design". Este libro retoma el concepto que Ethan Marcotte había acuñado, pero le agrega buenas prácticas relacionadas con el uso de media queries, técnicas de CSS y programación en JavaScript.
+
+Te recomiendo leer estos dos libros. Si no quieres comprar los libros o leerlos (ya que están en inglés y no están traducidos), te comento que en mi sección de cursos tengo una lista de reproducción de un curso llamado "Responsive Design". A lo largo de este curso, te voy explicando conceptos que tomo directamente de estos dos libros: tanto de "Responsive Web Design" como de "Responsible Responsive Design", que, traducido al español, sería algo como "Cómo hacer un diseño para dispositivos móviles de manera responsable".
+
+Antes de resolver el ejercicio (que estoy seguro les interesará a muchos), quería que entendieran el porqué de los ejercicios que vamos a hacer hoy y lo potente que es que ustedes empiecen a implementar estas prácticas en sus proyectos.
+
+Hacemos pequeña modificaciones al `dom-ejercicio.html` agregando mas enlaces a la etiqueta `<nav></nav>`, como agregando mas `<section></section>` a la etiqueta `<main>`. El titulo que llevara este capitulo y que debe ser escrito en los enlaces del nav como el h2 de la section es `Responsive con JavaScript`.
+
+Para este ejercicio, si lo comparamos con el ejercicio ya resuelto, vemos que hay un video y un mapa de Google. Sin embargo, podría ser cualquier contenido que no sea texto, como un video, un audio de HTML, o incluso podría ser, por ejemplo, embeber una línea de tiempo de comentarios de Twitter, una línea de comentarios de Facebook, o una foto de Instagram.
+
+Esta técnica del diseño receptivo responsable (o responsible responsive design) no es otra cosa más que responsive design con JavaScript. La idea es que, para cualquier contenido que no sea texto, trates de evitarlo en las versiones para dispositivos móviles. Lo que se sugiere es que, en lugar de embeber el contenido directamente, lo linkees.
+
+Entonces, en este caso, yo estoy poniendo un mapa y un video, pero, como les digo, podría ser cualquier otro contenido, como un enlace para embeber un PDF, una línea de tiempo, o un widget de alguna red social.
+
+Lo que necesitamos es una div vacia para ambos elementos: `<div id="youtube"></div>`. Es muy importante que, como cada elemento va a capturar un contenido particular, estas prácticas estén evaluando específicamente cada uno de los elementos en los que queramos implementar diseño web receptivo responsable en nuestras aplicaciones. Por eso estoy utilizando id y no clases, ya que la invocación de la función que vamos a crear para hacer un elemento multimedia responsable se ejecutará una vez por cada elemento que queramos revisar y evaluar en nuestra aplicación. Es por esto que estamos utilizando id. Entonces, vamos a generar otro id: `<div id="gmaps"></div>` los 'id' pues hacen perfectamente referencia al contenido que van a cargar.
+
+`dom-ejercicio.html`
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ejercicios del DOM</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/hamburgers/1.2.1/hamburgers.min.css"
+    />
+    <link rel="stylesheet" href="css/dom-ejercicios.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>Ejercicios del DOM</h1>
+    </header>
+    <button class="panel-btn hamburger hamburger--spin" type="button">
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </button>
+    <aside class="panel">
+      <nav class="menu">
+        <a href="#seccion1">Reloj Digital y Alarma Sonora</a>
+        <a href="#seccion2">Eventos del Teclado</a>
+        <a href="#seccion3">Cuenta Regresiva</a>
+        <a href="#seccion4">Responsive con JavaScript</a>
+        <a href="#seccion5">Sección 5</a>
+        <a href="#seccion6">Sección 6</a>
+        <a href="#seccion7">Sección 7</a>
+      </nav>
+    </aside>
+    <main>
+      <section id="seccion1" class="section">
+        <h2>Reloj Digital y Alarma Sonora</h2>
+        <div id="reloj"></div>
+        <div>
+          <button id="activar-reloj">Iniciar Reloj</button>
+          <button id="desactivar-reloj">Detener Reloj</button>
+          <button id="activar-alarma">Iniciar alarma</button>
+          <button id="desactivar-alarma">Detener alarma</button>
+        </div>
+      </section>
+      <section id="seccion2" class="section">
+        <h2>Eventos del Teclado</h2>
+        <article class="stage">
+          <div class="ball"></div>
+        </article>
+      </section>
+      <section id="seccion3" class="section">
+        <h2>Cuenta Regresiva</h2>
+        <div id="countdown"></div>
+      </section>
+      <section id="seccion4" class="section">
+        <h2>Responsive con JavaScript</h2>
+        <div id="youtube"></div>
+        <div id="gmaps"></div>
+      </section>
+      <section id="seccion5" class="section">
+        <h2>Sección 5</h2>
+      </section>
+      <section id="seccion6" class="section">
+        <h2>Sección 5</h2>
+      </section>
+      <section id="seccion7" class="section">
+        <h2>Sección 5</h2>
+      </section>
+    </main>
+    <button class="scroll-top-btn hidden">&#11014;</button>
+    <!-- JavaScript 88. DOM Ejercicios Prácticos Tema DarkLight -->
+    <button class="dark-theme-btn">☀️🌙</button>
+
+    <script src="index.js" type="module"></script>
+  </body>
+</html>
+```
+
+Creamos un archivo en la carpeta `dom` > `objeto_responsive.js`. Creamos la variable de document `const d = document` y otra para window `w = window` Utilizaremos el objeto matchMedia. Creamos una funcion por defecto `export default function responsiveMedia(){}`.
+¿Qué parámetros necesitaríamos para ejecutar esta función?
+
+1. `id`: El `id` del elemento que vamos a estar revisando.
+2. `mq`: La media query en la cual se realizará el cambio. Es muy importante definir una media query válida en CSS, ya que será la que determine cuándo pasar del enlace al contenido embebido.
+3. `mobileContent`: El contenido HTML que queremos mostrar en la versión móvil.
+4. `desktopContent`: El contenido que queremos cargar dinámicamente en la versión de escritorio.
+
+En resumen, los cuatro parámetros son:
+
+- El id del elemento que se va a revisar.
+
+- La media query (mq) que define el cambio.
+
+- El contenido para móviles (mobileContent).
+
+- El contenido para escritorio (desktopContent).
+
+vamos a crear una variable que se va a llamar breakPoint y como su nombre lo dice es la que va a guardar la media query que el usuario me pase en la variable mq: `let breakpoint = w.matchMedia(mq)`
+
+`objeto_responsive.js`
+
+```js
+const d = document;
+const w = window;
+
+export default function responsiveMedia(id, mq, mobileContent, desktopContent) {
+  let breakpoint = w.matchMedia(mq);
+}
+```
+
+¿dónde vamos a ejecutar esta función `responsiveMedia()`? pues a la carga del documento`DOMContentLoaded`. responsiveMedia() recibe 4 parametros:
+
+1. El id (tendremos dos instancia ) que primeramenta capturamos es el de youtube. Muy importante como vamos a utilizar la funcion 'getElementById()' para capturar el selector solamente pasamos el nombre del selector que es `youtube`.
+2. Pasamos la mediaquery: cuando la minima anchura(declaramos entre parentesis como una cadena de texto porque asi es como definiriamos la mediaquery en CSS) sea 1024px esa sera la mediaquery `"(min-width:1024px)"`.
+3. "Contenido Móvil".
+4. "Contenido Escritorio".
+
+Redeclaramos nuevamente la funcion responsiveMedia() solo cambiando la id por `gmaps`
+
+`index_dom.js`
+
+```js
+import hamburgerMenu from "./dom/menu_hamburguesa.js";
+import { digitalClock, alarm } from "./dom/reloj.js";
+import { shortcuts, moveBall } from "./dom/teclado.js";
+import countdown from "./dom/cuenta_regresiva.js";
+import { scrollTopButton } from "./dom/boton_scroll.js";
+import darkTheme from "./dom/tema_oscuro.js";
+import responsiveMedia from "./dom/objecto_responsive.js";
+const d = document;
+
+d.addEventListener("DOMContentLoaded", (e) => {
+  hamburgerMenu(".panel-btn", ".panel", ".menu a");
+  digitalClock("#reloj", "#activar-reloj", "#desactivar-reloj");
+  alarm("#activar-alarma", "#desactivar-alarma");
+  countdown("countdown", "Jan 1,2025", "Feliz año nuevo");
+  scrollTopButton(".scroll-top-btn");
+  responsiveMedia(
+    "youtube",
+    "(min-width:1024px)",
+    "Contenido Móvil",
+    "Contenido Escritorio"
+  );
+  responsiveMedia(
+    "gmaps",
+    "(min-width:1024px)",
+    "Contenido Móvil",
+    "Contenido Escritorio"
+  );
+});
+
+d.addEventListener("keydown", (e) => {
+  shortcuts(e);
+  moveBall(e, ".ball", ".stage");
+});
+
+darkTheme(".dark-theme-btn", "dark-mode");
+```
+
+El `min-width: 1024px` que declaramos a la carga del documento en `index_dom.js` ya lo está capturando en la función responsiveMedia() con:`let breakpoint = w.matchMedia(mq);`. Ya tenemos la media query detectada a través de JavaScript.
+
+Muy importante: El objeto window.matchMedia nos permite, al igual que con los eventos y el addEventListener(), asignarle un listener. Sin embargo, este no es un addEventListener() común, sino un listener específico para media queries. Este listener estaría revisando constantemente la media query, y cuando detecte que la media query ya no se cumple, hará el cambio de contenido.
+
+A esta variable `breakpoint`, que contiene la media query de CSS, le voy a agregar un listener con addListener():`breakpoint.addListener();` El listener recibe una función que estará evaluando la media query, a la que llamaremos responsive.
+
+Creamos una función expresada llamada `responsive`, que recibe el evento (e) de la media query. Dentro de esta función es donde ocurrirá la "magia". Verificamos con un `if()` el parámetro `e.matches`. El parámetro `.matches` es un valor booleano (verdadero o falso) que determinará si la media query se cumple o no. Si se cumple, devolverá true; si no, devolverá false.Ahora, lo siguiente es capturar el id del elemento en cuestión, que sería el parámetro id, usando:`d.getElementById(id);` Este elemento HTML, en este caso, son las div vacías de youtube y gmaps.Cuando la media query se cumpla (es decir, cuando la anchura mínima sea de 1024px o más), significa que estamos en una interfaz de tipo escritorio. Entonces, lo que haremos es asignar al contenido innerHTML de ese elemento el valor de desktopContent:`d.getElementById(id).innerHTML = desktopContent;` Caso contrario (si la anchura es menor a 1024px), asignaremos el contenido de mobileContent:`d.getElementById(id).innerHTML = mobileContent;`.
+
+Si recargo el navegador, verán que la primera vez que carga, la función `responsive` (que está ejecutando el listener) no se ejecuta al inicio. Es decir, no se ejecuta a la carga del documento. Observen que las dos div siguen vacías hasta que se detecta un cambio en la media query. Solo entonces comienza a ejecutar ese contenido.
+
+Esto es muy importante. Lo único que habría que hacer, además de que la función responsive valide el cambio de media query cuando esta ya no se cumple o sí se cumple (usando `breakpoint.addListener(responsive);`), es ejecutar la función responsive directamente al cargar el documento.
+
+Recuerden que responsive recibe el evento de tipo media query. Entonces, lo único que hay que hacer es ejecutar la función y pasarle la variable que contiene toda la información de la media query en JavaScript, que es breakpoint. Con esto, prácticamente habríamos resuelto este ejercicio de manera similar a usar el método DOMContentLoaded o window.load.
+pues también hay que ejecutarla directamente a la hora que cargue el documento entonces aquí hay que ejecutar responsive acuérdense que responsive recibe el evento de tipo media query entonces aquí lo único que hay que hacer es ejecutar la función y pasarle la variable que contiene pues toda la información de la media query javascript que es el breakpoint `responsive(breakpoint);` y con esto prácticamente esto es como haber resuelto este ejercicio con el método 'DOMContentLoaded' o el window load esta línea `responsive(breakpoint)` y esta `breakpoint.addListener(responsive);` sería pues el evento rizase prácticamente ahora sí ya tenemos bien hecha nuestro response y porque también va a funcionar a la hora que cargue el documento va a evaluar cuál es la anchura del dispositivo y dependiendo de eso va a poner el contenido móvil o el contenido de escritorio y miren vean como ya no va a aparecer en en vacías mis div de youtube y meetic maps vean valida recarga como estoy en móvil en una en una resolución menor a 1024 me pone contenido móvil y ahí está.
+
+`objeto_responsive.js`
+
+```js
+const d = document;
+const w = window;
+
+export default function responsiveMedia(id, mq, mobileContent, desktopContent) {
+  let breakpoint = w.matchMedia(mq);
+
+  const responsive = (e) => {
+    if (e.matches) {
+      d.getElementById(id).innerHTML = desktopContent;
+    } else {
+      d.getElementById(id).innerHTML = mobileContent;
+    }
+  };
+
+  breakpoint.addListener(responsive);
+  responsive(breakpoint);
+}
+```
+
+Ahora es cuestion de cambiar los parametros de contenido Movil por los enlaces uno es `<a>` y el contenido escritorio un `<iframe>`
+`index_dom.js`
+
+```js
+import hamburgerMenu from "./dom/menu_hamburguesa.js";
+import { digitalClock, alarm } from "./dom/reloj.js";
+import { shortcuts, moveBall } from "./dom/teclado.js";
+import countdown from "./dom/cuenta_regresiva.js";
+import { scrollTopButton } from "./dom/boton_scroll.js";
+import darkTheme from "./dom/tema_oscuro.js";
+import responsiveMedia from "./dom/objecto_responsive.js";
+const d = document;
+
+d.addEventListener("DOMContentLoaded", (e) => {
+  hamburgerMenu(".panel-btn", ".panel", ".menu a");
+  digitalClock("#reloj", "#activar-reloj", "#desactivar-reloj");
+  alarm("#activar-alarma", "#desactivar-alarma");
+  countdown("countdown", "Jan 1,2025", "Feliz año nuevo");
+  scrollTopButton(".scroll-top-btn");
+  responsiveMedia(
+    "youtube",
+    "(min-width:1024px)",
+    ` <a
+      href="https://youtu.be/2SetvwBV-SU?si=2xiO2KBI_-HxxKsQ"
+      target="_blank"
+      rel="noopener"
+      >Ver Video</a
+    >`,
+    `<iframe width="560" height="315" src="https://www.youtube.com/embed/2SetvwBV-SU?si=pZsUFQcoyiZKGBcC" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+  );
+  responsiveMedia(
+    "gmaps",
+    "(min-width:1024px)",
+    ` <a
+      href="https://maps.app.goo.gl/CWzqnYEMr8qPKSFv7"
+      target="_blank"
+      rel="noopener"
+      >Ver Video</a
+    >`,
+    `<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1968.033890227946!2d-82.5222771219447!3d9.415453861511347!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8fa614f93d1a84f1%3A0x2ebb42a2322d49aa!2sEstadio%20Calvin%20Byron!5e0!3m2!1ses!2spa!4v1740004638900!5m2!1ses!2spa" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`
+  );
+});
+
+d.addEventListener("keydown", (e) => {
+  shortcuts(e);
+  moveBall(e, ".ball", ".stage");
+});
+
+darkTheme(".dark-theme-btn", "dark-mode");
 ```
 
 [indice](#ejercicio-del-dom)
